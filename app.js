@@ -1,17 +1,25 @@
 const express = require("express");
 const app = express();
-const port = 3000;
+const connectDb = require("./db/connect");
 const tasks = require("./route/tasks");
+require("dotenv").config();
+const port = 3000;
 // middware
 app.use(express.json());
+app.use(express.static("./public"));
 
 // route
-app.get("/hello", (req, res) => {
-  return res.send("Task manager");
-});
 
 app.use("/api/v1/tasks", tasks);
 
-app.listen(port, () => {
-  console.log(`Sever is listening on port ${port}...`);
-});
+const start = async () => {
+  try {
+    await connectDb(process.env.MONGO_URI);
+    app.listen(port, () => {
+      console.log(`Sever is listening on port ${port}...`);
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+start();
